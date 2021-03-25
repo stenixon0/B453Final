@@ -7,7 +7,7 @@ public class FlowFieldParticle : MonoBehaviour
     public float _moveSpeed;
     private void Update()
     {
-    this.transform.position += transform.forward * _moveSpeed * Time.deltaTime;
+        this.transform.position += transform.forward * _moveSpeed * Time.deltaTime;
     }
 
     public void ApplyRotation(Vector3 rotation, float rotateSpeed)
