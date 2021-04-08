@@ -7,20 +7,30 @@ public class Vehicle : MonoBehaviour
     /*
      * Code adapted from https://github.com/nature-of-code/noc-examples-processing/blob/master/chp06_agents/NOC_6_04_Flowfield/Vehicle.pde
      * 
+     * The Nature of Code
+     * Daniel Shiffman
+     * http://natureofcode.com
      * 
      */
 
-    Vector3 position;
     Vector3 velocity;
     Vector3 acceleration;
+
+    //[my addition to expose width and height to the editor]
+    public float height = 20f, width = 20f;
 
     float r;
     float maxforce; // Maximum steering force
     float maxspeed; // Maximum speed
-
-    Vehicle(Vector3 l, float ms, float mf)
+    private void Start()
     {
-        position = l;
+        r = 3.0f;
+        maxspeed = 3f;
+        maxforce = 0.2f;
+    }
+    public void constructVehicle(Vector3 l, float ms, float mf)
+    {
+        transform.position = l;
         r = 3.0f;
         maxspeed = ms;
         maxforce = mf;
@@ -35,10 +45,10 @@ public class Vehicle : MonoBehaviour
 
     // Implementing Reynolds' flow field following algorithm
     // http://www.red3d.com/cwr/steer/FlowFollow.html
-    void follow(FlowField flow)
+    public void follow(FlowField flow)
     {
         // What is the vector at that spot in the flow field?
-        Vector3 desired = flow.lookup(position);
+        Vector3 desired = flow.lookup(transform.position);
         // Scale it up by maxpeed
         desired = desired * maxspeed;
         // Steering is desired - velocity
@@ -60,24 +70,22 @@ public class Vehicle : MonoBehaviour
         velocity += acceleration;
         // Limit Speed
         //velocity.limit(maxspeed); <- TODO: find Unity's limit equivalent
-        position += velocity;
+        transform.position += velocity;
         acceleration *= 0;
     }
 
     //TODO: Adapt display()
-
-    //TODO: implement width/ height equivalents
-    /*
+    
     void borders()
     {
-        float width = 0, height = 0;
+        //[below line added to better fit adapted code
+        Vector3 position = transform.position;
+
         if (position.x < -r) position.x = width + r;
         if (position.y < -r) position.y = height + r;
         if (position.x > width + r) position.x = -r;
         if (position.y > height + r) position.y = -r;
-
-
     }
-    */
+    
 
 }

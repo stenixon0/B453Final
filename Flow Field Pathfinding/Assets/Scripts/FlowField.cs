@@ -14,58 +14,91 @@ public class FlowField : MonoBehaviour
      * [TODO] adapt main block of code
      * 
      */
-    Vector2[,] field;
-    int cols, rows; // Columns and Rows
-    int resolution; // How large is each "cell" of the flow field
 
-    FlowField(int r)
+
+    /*
+     * Variables below are from an adaptation of this tutorial by Peter Olthof of Peer Play
+     * https://www.youtube.com/watch?v=gPNdnIMbe8o
+     * 
+     */
+    public Vector3[,,] flowfieldDirection;
+    public float cellSize = 2;
+    public Vector3Int gridSize = new Vector3Int(10, 10, 10);
+    public float increment = 0.5f;
+    //public Vector3 _offset, offsetSpeed;
+
+    public bool debug = true;
+
+    //Adapted from Peter Olthof
+    public FlowField()
     {
-        resolution = r;
-        cols = resolution; // [??? Original code based on width of sketch]
-        rows = resolution; // [??? Same]
-        field = new Vector2[cols, rows];
-        init();
+        flowfieldDirection = new Vector3[gridSize.x, gridSize.y, gridSize.z];
+
     }
-
-    void init()
+    private void Start()
     {
-        //TODO: Fast Noise applied in context noiseSeed((int)random(10000));
-        float xoff = 0;
-        for (int i = 0; i < cols; i++)
-        {
-            float yoff = 0;
-            for (int j = 0; j < rows; j++)
-            {
-                float theta = 0; //[map(noise(xoff,yoff), 0,1,0,TWO_PI); <- adapt for fast noise]
-                // Polar to cartesian coordinate transformation to get x and y [and Z] components of the vector
-                yoff += 0.1f;
-            }
-            xoff += 0.1f;
-        }
-    }
-
-    void display()
-    {
-        for (int i = 0; i < cols; i++)
-        {
-            for (int j = 0; j < rows; j++)
-            {
-                //[TODO: Adapt cone primitives to appropriately display vector length and direction] 
-                //drawVector(field[i][j], i * resolution, j*resolution, resolution-2);
-                break;
-            }
-        }
-    }
-    //TODO: DrawVector
-
-    void drawVector(Vector2 v, float x, float y, float scayl)
-    {
-        
+        CalculateFlowFieldDirections();
     }
 
     //TODO: Lookup
     public Vector3 lookup(Vector3 lookup)
     {
-        return lookup;
+        return flowfieldDirection[
+            Mathf.RoundToInt(lookup.x / cellSize),
+            Mathf.RoundToInt(lookup.y / cellSize),
+            Mathf.RoundToInt(lookup.z / cellSize)];
+    }
+
+    /* 
+     * Below code adapted from https://www.youtube.com/watch?v=gPNdnIMbe8o
+     * 
+     */
+    void CalculateFlowFieldDirections()
+    {
+        float xOff = 0f;
+
+        for (int x = 0; x < gridSize.x; x++)
+        {
+            float yOff = 0;
+            for (int y = 0; y < gridSize.y; y++)
+            {
+                float zOff = 0f;
+                for (int z = 0; z < gridSize.z; z++)
+                {
+                    //float noise = _fastNoise.GetSimplex(xOff + _offset.x, yOff + _offset.y, zOff + _offset.z) + 1;
+                    Vector3 noiseDirection = Vector3.up; //new Vector3(Mathf.Cos(noise * Mathf.PI), Mathf.Sin(noise * Mathf.PI), Mathf.Cos(noise * Mathf.PI));
+                    Vector3 nd = noiseDirection.normalized;
+
+                    flowfieldDirection[x, y, z] = nd;
+
+                    zOff += increment;
+                }
+                yOff += increment;
+            }
+            xOff += increment;
+        }
+    }
+    private void OnDrawGizmos()
+    {
+        if (debug)
+        {
+            for (int x = 0; x < gridSize.x; x++)
+            {
+
+                for (int y = 0; y < gridSize.x; y++)
+                {
+
+                    for (int z = 0; z < gridSize.x; z++)
+                    {
+                        Vector3 nd = flowfieldDirection[x, y, z];
+                        Gizmos.color = new Color(nd.x, nd.y, nd.z, 0.4f);
+                        Vector3 pos = new Vector3(x, y, z);// + transform.position;
+                        Vector3 endpos = pos + Vector3.Normalize(Vector3.zero);
+                        Gizmos.DrawLine(pos, endpos);
+                        Gizmos.DrawSphere(endpos, 0.1f);
+                    }
+                }
+            }
+        }
     }
 }

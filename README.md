@@ -1,7 +1,5 @@
 # B453Final
 
-TODO: Document FastNoise and 6.2 + 6.3
-
 Many thanks to Dan Schiffman and his course The Nature of Code
 
 https://natureofcode.com/
@@ -16,3 +14,7 @@ The discussion of Steering Behaviors originates from http://www.red3d.com/cwr/st
 
 Which was published as part of a paper published for GDC in 1999
 http://www.red3d.com/cwr/papers/1999/gdc99steer.html
+
+FlowField contains a function CalculateFlowFieldDirections 
+This code was adapted from a tutorial series by Peter Olthof of Peer Play
+https://www.youtube.com/watch?v=gPNdnIMbe8o
