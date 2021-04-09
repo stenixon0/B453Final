@@ -25,7 +25,7 @@ public class Vehicle : MonoBehaviour
     private void Start()
     {
         //r = 3.0f;
-        maxspeed = 3f;
+        maxspeed = 1f;
         maxforce = 0.2f;
     }
     public void constructVehicle(Vector3 l, float ms, float mf)
@@ -42,7 +42,7 @@ public class Vehicle : MonoBehaviour
     // http://www.red3d.com/cwr/steer/FlowFollow.html
     public void follow(FlowField flow)
     {
-        Vector3Int index = flow.boundsCheck(transform.position);
+        Vector3Int index = boundsCheck(flow);
         // What is the vector at that spot in the flow field?
         Vector3 desired = flow.lookup(index);
         // Scale it up by maxpeed
@@ -52,40 +52,37 @@ public class Vehicle : MonoBehaviour
         Vector3.ClampMagnitude(steer, maxforce);
 
         applyForce(steer);
-        ManualUpdate();
     }
-    /*
+    
     Vector3Int boundsCheck(FlowField flow)
     {
         Vector3Int gridSize = flow.getGridSize();
         float cellSize = flow.getCellSize();
         Vector3 tp = transform.position;
 
-        int x = Mathf.RoundToInt(tp.x / cellSize);
-        int y = Mathf.RoundToInt(tp.y / cellSize);
-        int z = Mathf.RoundToInt(tp.z / cellSize);
-        if (x > gridSize.x) x = gridSize.x;
-        if (x < 0) x = 0;
+        //Mutates transform.position to fit within bounds
+        if (tp.x >= gridSize.x * cellSize) tp.x = 0;
+        if (tp.x < 0) tp.x = (gridSize.x - 1) * cellSize;
 
-        if (y > gridSize.x) y = gridSize.y;
-        if (y < 0) y = 0;
+        if (tp.y >= gridSize.y * cellSize) tp.y = 0;
+        if (tp.y < 0) tp.y = (gridSize.y - 1) * cellSize;
 
-        if (z > gridSize.z) z = gridSize.z;
-        if (z < 0) z = 0;
+        if (tp.z >= gridSize.z * cellSize) tp.z = 0;
+        if (tp.z < 0) tp.z = (gridSize.z - 1) * cellSize;
+
+        transform.position = tp;
+
+        int x = Mathf.FloorToInt(tp.x / cellSize);
+        int y = Mathf.FloorToInt(tp.y / cellSize);
+        int z = Mathf.FloorToInt(tp.z / cellSize);
         return new Vector3Int(x, y, z);
     }
-    */
+    
 
     void applyForce(Vector3 force)
     {
         //We could add mass here if we want A = F / M
         acceleration += force;
-    }
-
-    
-    // Method to update position
-    private void ManualUpdate()
-    {
         //borders();
         //Update velocity
         velocity += acceleration;

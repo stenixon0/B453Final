@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
                 Random.Range(tp.z, tp.z + flowfield.gridSize.z * flowfield.cellSize)
                 );
             Vehicle newVehicle = Instantiate(vehiclePrefab, randomPos, Quaternion.identity);
-            newVehicle.constructVehicle(randomPos, 3, 0.2f); //[Placeholder values for initial position, mf, and ms]
+            newVehicle.constructVehicle(randomPos, 1f, 0.2f); //[Placeholder values for initial position, mf, and ms]
             vehicles.Add(newVehicle);
         }
     }
