@@ -17,45 +17,64 @@ public class Vehicle : MonoBehaviour
     Vector3 acceleration;
 
     //[my addition to expose width and height to the editor]
-    public float height = 20f, width = 20f;
+    //public float height = 20f, width = 20f;
 
-    float r;
+    //float r;
     float maxforce; // Maximum steering force
     float maxspeed; // Maximum speed
     private void Start()
     {
-        r = 3.0f;
+        //r = 3.0f;
         maxspeed = 3f;
         maxforce = 0.2f;
     }
     public void constructVehicle(Vector3 l, float ms, float mf)
     {
         transform.position = l;
-        r = 3.0f;
+        //r = 3.0f;
         maxspeed = ms;
         maxforce = mf;
         acceleration = Vector3.zero;
         velocity = Vector3.zero;
     }
 
-    public void run()
-    {
-        //TODO: update borders display
-    }
-
     // Implementing Reynolds' flow field following algorithm
     // http://www.red3d.com/cwr/steer/FlowFollow.html
     public void follow(FlowField flow)
     {
+        Vector3Int index = flow.boundsCheck(transform.position);
         // What is the vector at that spot in the flow field?
-        Vector3 desired = flow.lookup(transform.position);
+        Vector3 desired = flow.lookup(index);
         // Scale it up by maxpeed
         desired = desired * maxspeed;
         // Steering is desired - velocity
         Vector3 steer = desired - velocity;
-        //steer.limit(maxforce) <- TODO find Unity's limit equivalent
+        Vector3.ClampMagnitude(steer, maxforce);
+
         applyForce(steer);
+        ManualUpdate();
     }
+    /*
+    Vector3Int boundsCheck(FlowField flow)
+    {
+        Vector3Int gridSize = flow.getGridSize();
+        float cellSize = flow.getCellSize();
+        Vector3 tp = transform.position;
+
+        int x = Mathf.RoundToInt(tp.x / cellSize);
+        int y = Mathf.RoundToInt(tp.y / cellSize);
+        int z = Mathf.RoundToInt(tp.z / cellSize);
+        if (x > gridSize.x) x = gridSize.x;
+        if (x < 0) x = 0;
+
+        if (y > gridSize.x) y = gridSize.y;
+        if (y < 0) y = 0;
+
+        if (z > gridSize.z) z = gridSize.z;
+        if (z < 0) z = 0;
+        return new Vector3Int(x, y, z);
+    }
+    */
 
     void applyForce(Vector3 force)
     {
@@ -63,9 +82,11 @@ public class Vehicle : MonoBehaviour
         acceleration += force;
     }
 
+    
     // Method to update position
-    private void Update()
+    private void ManualUpdate()
     {
+        //borders();
         //Update velocity
         velocity += acceleration;
         // Limit Speed
@@ -73,9 +94,9 @@ public class Vehicle : MonoBehaviour
         transform.position += velocity;
         acceleration *= 0;
     }
-
-    //TODO: Adapt display()
     
+    
+    /*
     void borders()
     {
         //[below line added to better fit adapted code
@@ -86,6 +107,6 @@ public class Vehicle : MonoBehaviour
         if (position.x > width + r) position.x = -r;
         if (position.y > height + r) position.y = -r;
     }
-    
+    */
 
 }

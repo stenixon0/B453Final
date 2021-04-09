@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flowfield: {fileID: 486639731077123669, guid: df57111396885ab48af07e7e20c755f6, type: 3}
   vehicleCount: 20
-  vehiclePrefab: {fileID: 502442450130709931, guid: 4fcd2df9a59d8ea4ab4b98435e117aa4, type: 3}
+  vehiclePrefab: {fileID: 644943563731654074, guid: 4fcd2df9a59d8ea4ab4b98435e117aa4, type: 3}
 --- !u!4 &525438198
 Transform:
   m_ObjectHideFlags: 0

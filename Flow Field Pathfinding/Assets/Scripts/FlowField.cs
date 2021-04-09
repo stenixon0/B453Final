@@ -29,24 +29,60 @@ public class FlowField : MonoBehaviour
 
     public bool debug = true;
 
-    //Adapted from Peter Olthof
-    public FlowField()
-    {
-        flowfieldDirection = new Vector3[gridSize.x, gridSize.y, gridSize.z];
-
-    }
     private void Start()
     {
+        //Adapted from Peter Olthof of Peer Play
+        flowfieldDirection = new Vector3[gridSize.x, gridSize.y, gridSize.z];
         CalculateFlowFieldDirections();
     }
 
-    //TODO: Lookup
+    public Vector3Int getGridSize()
+    {
+        return gridSize;
+    }
+    public float getCellSize()
+    {
+        return cellSize;
+    }
+
+    //[Lookup takes a Vector3 representing location, and returns the appropriate velocity
+
     public Vector3 lookup(Vector3 lookup)
     {
-        return flowfieldDirection[
-            Mathf.RoundToInt(lookup.x / cellSize),
-            Mathf.RoundToInt(lookup.y / cellSize),
-            Mathf.RoundToInt(lookup.z / cellSize)];
+
+        /*
+         * Bounds check should be handled by Vehicle.boundsCheck()
+        if (x > gridSize.x) x = gridSize.x;
+        if (x < 0) x = 0;
+
+        if (y > gridSize.x) y = gridSize.y;
+        if (y < 0) y = 0;
+
+        if (z > gridSize.z) z = gridSize.z;
+        if (z < 0) z = 0;
+        */
+        Vector3Int corrected = boundsCheck(lookup);
+
+        return flowfieldDirection[corrected.x, corrected.y, corrected.z];
+    }
+
+    public Vector3Int boundsCheck(Vector3 lookup)
+    {
+        int x = Mathf.RoundToInt(lookup.x / cellSize);
+        int y = Mathf.RoundToInt(lookup.y / cellSize);
+        int z = Mathf.RoundToInt(lookup.z / cellSize);
+
+        //Bounds check should be handled by Vehicle.boundsCheck()
+        if (x >= gridSize.x) x = gridSize.x - 1;
+        if (x < 0) x = 0;
+
+        if (y >= gridSize.x) y = gridSize.y - 1;
+        if (y < 0) y = 0;
+
+        if (z >= gridSize.z) z = gridSize.z - 1;
+        if (z < 0) z = 0;
+
+        return new Vector3Int(x, y, z);
     }
 
     /* 

@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
         foreach (Vehicle v in vehicles)
         {
             v.follow(flowfield);
-            v.run();
         }
     }
+
 }
