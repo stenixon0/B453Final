@@ -106,12 +106,8 @@ public class FlowField : MonoBehaviour
 
     private Vector3 CustomFlowFunction(Vector3Int index)
     {
-        int randomizer = Mathf.FloorToInt(Random.Range(0, 3));
-        Vector3[] directions = { Vector3.up, Vector3.left, Vector3.forward};
-
-        //result.x = (index.x < gridSize.x / 2) ? result.x = 1 : result.x = -1;
-        //result.z = (index.z < gridSize.z / 2) ? result.z = 1 : result.z = -1;
-        return directions[randomizer];
+        //F(x,y,z) = [-z, y, -x]
+        return new Vector3(-(index.x - gridSize.x / 2), Mathf.Abs(index.y - gridSize.y / 2) + 0.1f, -(index.z - gridSize.z / 2));
     }
     private void OnDrawGizmos()
     {
@@ -126,8 +122,8 @@ public class FlowField : MonoBehaviour
                     for (int z = 0; z < gridSize.x; z++)
                     {
                         Vector3 nd = flowfieldDirection[x, y, z];
-                        Gizmos.color = new Color(nd.x, nd.y, nd.z, 0.4f);
-                        Vector3 pos = cellSize * (new Vector3(x, y, z) + transform.position);
+                        Gizmos.color = new Color(Mathf.Abs(nd.x), Mathf.Abs(nd.y), Mathf.Abs(nd.z), 0.4f);//[Adjusted for negative values]
+                        Vector3 pos = cellSize * (new Vector3(x, y, z) + transform.position - gridSize/2); //[Adjusted for negative offset]
                         Vector3 endpos = pos + Vector3.Normalize(nd);
                         Gizmos.DrawLine(pos, endpos);
                         Gizmos.DrawSphere(endpos, 0.05f);

@@ -60,27 +60,44 @@ public class Vehicle : MonoBehaviour
         float cellSize = flow.getCellSize();
         Vector3 tp = transform.position;
 
+        //[from a transform.position, the corresponding index is returned]
+        Vector3 locationConversion =
+            new Vector3(
+                tp.x / cellSize + gridSize.x / 2,
+                tp.y / cellSize + gridSize.y / 2,
+                tp.z / cellSize + gridSize.z / 2);
+        //[simplifies bound corrections]
+        Vector3 gridConversion =
+            new Vector3(
+                gridSize.x / 2 * cellSize,
+                gridSize.y / 2 * cellSize,
+                gridSize.z / 2 * cellSize
+                );
+
+
         //Mutates transform.position to fit within bounds
-        if (tp.x >= gridSize.x * cellSize) tp.x = 0;
-        if (tp.x < 0) tp.x = (gridSize.x - 1) * cellSize;
+        if (locationConversion.x >= gridSize.x - 1) tp.x = -gridConversion.x;
+        if (locationConversion.x < 0) tp.x = gridConversion.x;
 
-        if (tp.y >= gridSize.y * cellSize) tp.y = 0;
-        if (tp.y < 0) tp.y = (gridSize.y - 1) * cellSize;
+        if (locationConversion.y >= gridSize.y -  1) tp.y = -gridConversion.y;
+        if (locationConversion.y < 0) tp.y = gridConversion.y;
 
-        if (tp.z >= gridSize.z * cellSize) tp.z = 0;
-        if (tp.z < 0) tp.z = (gridSize.z - 1) * cellSize;
+        if (locationConversion.z >= gridSize.z - 1) tp.z = -gridConversion.z;
+        if (locationConversion.z < 0) tp.z = gridConversion.z;
 
         transform.position = tp;
 
-        int x = Mathf.FloorToInt(tp.x / cellSize);
-        int y = Mathf.FloorToInt(tp.y / cellSize);
-        int z = Mathf.FloorToInt(tp.z / cellSize);
+        //New transform.position converted to appropriate index (should fit within bounds now)
+        int x = Mathf.FloorToInt(tp.x / cellSize + gridSize.x / 2);
+        int y = Mathf.FloorToInt(tp.y / cellSize + gridSize.y / 2);
+        int z = Mathf.FloorToInt(tp.z / cellSize + gridSize.z / 2);
         return new Vector3Int(x, y, z);
     }
     
 
     void applyForce(Vector3 force)
     {
+        //These functions are convoluted, how will acceleration ever increase?
         //We could add mass here if we want A = F / M
         acceleration += force;
         //borders();
