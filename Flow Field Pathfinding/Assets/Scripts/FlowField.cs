@@ -121,6 +121,7 @@ public class FlowField : MonoBehaviour
 
                     for (int z = 0; z < gridSize.x; z++)
                     {
+                        //copied from Peer Play
                         Vector3 nd = flowfieldDirection[x, y, z];
                         Gizmos.color = new Color(Mathf.Abs(nd.x), Mathf.Abs(nd.y), Mathf.Abs(nd.z), 0.4f);//[Adjusted for negative values]
                         Vector3 pos = cellSize * (new Vector3(x, y, z) + transform.position - gridSize/2); //[Adjusted for negative offset]

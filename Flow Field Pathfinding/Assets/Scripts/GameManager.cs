@@ -33,14 +33,14 @@ public class GameManager : MonoBehaviour
         Vector3 tp = transform.position;
         for (int i =0; i < vehicleCount; i++)
         {
-            //Copied from Peer Play
+            //Copied from Peer Play and adjusted for negative offset (should really be calculated in flowfield)
             Vector3 randomPos = new Vector3(
-                Random.Range(tp.x, tp.x + flowfield.gridSize.x * flowfield.cellSize),
-                Random.Range(tp.y, tp.y + flowfield.gridSize.y * flowfield.cellSize),
-                Random.Range(tp.z, tp.z + flowfield.gridSize.z * flowfield.cellSize)
+                Random.Range(flowfield.cellSize * -flowfield.gridSize.x / 2, (flowfield.gridSize.x - 1) / 2 * flowfield.cellSize),
+                Random.Range(flowfield.cellSize * -flowfield.gridSize.y / 2, (flowfield.gridSize.y - 1)/ 2 * flowfield.cellSize),
+                Random.Range(flowfield.cellSize * -flowfield.gridSize.z / 2, (flowfield.gridSize.z - 1) / 2 * flowfield.cellSize)
                 );
             Vehicle newVehicle = Instantiate(vehiclePrefab, randomPos, Quaternion.identity);
-            newVehicle.constructVehicle(randomPos, 1f, 0.2f); //[Placeholder values for initial position, mf, and ms]
+            newVehicle.constructVehicle(0.1f, 0.2f, flowfield); //[Placeholder values for initial position, mf, and ms]
             vehicles.Add(newVehicle);
         }
     }
@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
         // Tell all the vehicles to follow the flow field
         foreach (Vehicle v in vehicles)
         {
-            v.follow(flowfield);
+            v.movementManager();
         }
     }
 

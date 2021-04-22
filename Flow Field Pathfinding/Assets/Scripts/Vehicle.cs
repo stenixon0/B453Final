@@ -12,6 +12,7 @@ public class Vehicle : MonoBehaviour
      * http://natureofcode.com
      * 
      */
+    public FlowField flowfield;
 
     Vector3 velocity;
     Vector3 acceleration;
@@ -22,29 +23,42 @@ public class Vehicle : MonoBehaviour
     //float r;
     float maxforce; // Maximum steering force
     float maxspeed; // Maximum speed
-    private void Start()
+
+    bool in_bounds = true;
+    public void constructVehicle(float ms, float mf, FlowField flow)
     {
-        //r = 3.0f;
-        maxspeed = 1f;
-        maxforce = 0.2f;
-    }
-    public void constructVehicle(Vector3 l, float ms, float mf)
-    {
-        transform.position = l;
         //r = 3.0f;
         maxspeed = ms;
         maxforce = mf;
         acceleration = Vector3.zero;
         velocity = Vector3.zero;
+        flowfield = flow;
+    }
+
+    public void movementManager()
+    {
+        if (in_bounds)
+        {
+            Vector3Int index = boundsCheck();
+            Vector3Int failExample = new Vector3Int(-1, -1, -1);
+            if (index == failExample) in_bounds = false;
+            else applyForce(flowfield.lookup(index));
+        } 
+        else
+        {
+            //Vehicle continues with set velocity
+            applyForce(Vector3.zero);
+        }
     }
 
     // Implementing Reynolds' flow field following algorithm
     // http://www.red3d.com/cwr/steer/FlowFollow.html
-    public void follow(FlowField flow)
+    //Has become inert
+    public void follow(Vector3Int index)
     {
-        Vector3Int index = boundsCheck(flow);
         // What is the vector at that spot in the flow field?
-        Vector3 desired = flow.lookup(index);
+        //High risk of OOB Exception -> movementManager should handle this
+        Vector3 desired = flowfield.lookup(index);
         // Scale it up by maxpeed
         desired = desired * maxspeed;
         // Steering is desired - velocity
@@ -54,10 +68,10 @@ public class Vehicle : MonoBehaviour
         applyForce(steer);
     }
     
-    Vector3Int boundsCheck(FlowField flow)
+    Vector3Int boundsCheck()
     {
-        Vector3Int gridSize = flow.getGridSize();
-        float cellSize = flow.getCellSize();
+        Vector3Int gridSize = flowfield.getGridSize();
+        float cellSize = flowfield.getCellSize();
         Vector3 tp = transform.position;
 
         //[from a transform.position, the corresponding index is returned]
@@ -76,16 +90,15 @@ public class Vehicle : MonoBehaviour
 
 
         //Mutates transform.position to fit within bounds
-        if (locationConversion.x >= gridSize.x - 1) tp.x = -gridConversion.x;
-        if (locationConversion.x < 0) tp.x = gridConversion.x;
+        Vector3Int failedCheck = new Vector3Int(-1, -1, -1);
+        if (locationConversion.x >= gridSize.x - 1) return failedCheck;
+        if (locationConversion.x < 0) return failedCheck;
 
-        if (locationConversion.y >= gridSize.y -  1) tp.y = -gridConversion.y;
-        if (locationConversion.y < 0) tp.y = gridConversion.y;
+        if (locationConversion.y >= gridSize.y -  1) return failedCheck;
+        if (locationConversion.y < 0) return failedCheck;
 
-        if (locationConversion.z >= gridSize.z - 1) tp.z = -gridConversion.z;
-        if (locationConversion.z < 0) tp.z = gridConversion.z;
-
-        transform.position = tp;
+        if (locationConversion.z >= gridSize.z - 1) return failedCheck;
+        if (locationConversion.z < 0) return failedCheck;
 
         //New transform.position converted to appropriate index (should fit within bounds now)
         int x = Mathf.FloorToInt(tp.x / cellSize + gridSize.x / 2);
@@ -93,7 +106,7 @@ public class Vehicle : MonoBehaviour
         int z = Mathf.FloorToInt(tp.z / cellSize + gridSize.z / 2);
         return new Vector3Int(x, y, z);
     }
-    
+
 
     void applyForce(Vector3 force)
     {
@@ -105,22 +118,8 @@ public class Vehicle : MonoBehaviour
         velocity += acceleration;
         // Limit Speed
         //velocity.limit(maxspeed); <- TODO: find Unity's limit equivalent
+        velocity = Vector3.ClampMagnitude(velocity, maxspeed);
         transform.position += velocity;
         acceleration *= 0;
     }
-    
-    
-    /*
-    void borders()
-    {
-        //[below line added to better fit adapted code
-        Vector3 position = transform.position;
-
-        if (position.x < -r) position.x = width + r;
-        if (position.y < -r) position.y = height + r;
-        if (position.x > width + r) position.x = -r;
-        if (position.y > height + r) position.y = -r;
-    }
-    */
-
 }
