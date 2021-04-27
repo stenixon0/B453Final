@@ -22,7 +22,7 @@ public class FlowField : MonoBehaviour
      * 
      */
     public Vector3[,,] flowfieldDirection;
-    public float cellSize = 2;
+    public float cellSize = 0.01f;
     public Vector3Int gridSize = new Vector3Int(10, 10, 10);
     //public float increment = 0.5f;
     //public Vector3 _offset, offsetSpeed;
